@@ -1,0 +1,49 @@
+\section*{Результаты}
+
+\subsection*{Пример работы программы}
+
+\begin{lstlisting}
+(base) MacBook-Air-Dima:Program dandachok$ cat tests/input/part1.t
+4
+9 -5 -6 3
+1 -7 1 0
+3 -4 -9 0
+6 -1 9 8
+
+-8 38 47 -8
+(base) MacBook-Air-Dima:Program dandachok$ ./part1 <tests/input/part1.t
+L: {[1, 0, 0, 0]
+[0.1111, 1, 0, 0]
+[0.3333, 0.3621, 1, 0]
+[0.6667, -0.3621, -1.789, 1]
+}
+U:{[9, -5, -6, 3]
+[0, -6.444, 1.667, -0.3333]
+[0, 0, -7.603, -0.8793]
+[0, 0, 0, 4.306]
+}
+LU solve:[-15.98, -8.668, -6.697, 17.44]
+Gausse solve:[-15.98, -8.668, -6.697, 17.44]
+\end{lstlisting}
+
+$$L = \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0.1111 & 1 & 0 & 0 \\
+    0.3333 & 0.3621 & 1 & 0 \\
+    0.6667 & -0.3621 & -1.789 & 1 \\
+\end{pmatrix},\quad
+U = \begin{pmatrix}
+    9 & -5 & -6 & 3 \\
+    0 & -6.444 & 1.667 & -0.3333 \\
+    0 & 0 & -7.603 & -0.8793 \\
+    0 & 0 & 0 & 4.306
+\end{pmatrix}$$
+
+$$x=\begin{pmatrix}
+    -8 \\
+    38 \\
+    47 \\
+    -8
+\end{pmatrix}$$
+
+\pagebreak

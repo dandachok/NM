@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -37,26 +39,30 @@ std::istream& operator>> (std::istream& in, vdouble& v) {
     return in;
 }
 
-std::ostream& operator<< (std::ostream& out, const vvdouble& mat) {
-    for (const auto& i: mat) {
-        for (const auto& j: i) {
-            out << j << ' ';
-        }
-
-        out << '\n';
-    }
-
-    return out;
-}
-
 std::ostream& operator<< (std::ostream& out, const vdouble& mat) {
-    for (const auto& i: mat) {
-            out << i << ' ';
+    out.precision(4);
+    std::cout << '[';
+    for (int i = 0; i < mat.size(); ++i) {
+            out << mat[i];
+            if (i < mat.size() - 1) {
+                std::cout << ", ";
+            }
     }
-    out << '\n';
+    out << "]";
 
     return out;
 }
+
+std::ostream& operator<< (std::ostream& out, const vvdouble& mat) {
+    out << '{';
+    for (const auto& i: mat) {
+        out << i << '\n';
+    }
+    out << "}\n";
+    return out;
+}
+
+
 
 complex operator+ (complex a, const complex& c) {
     a.first += c.first;
@@ -96,6 +102,14 @@ vvdouble operator* (double a, vvdouble b) {
         }
     }
     return b;
+}
+
+vdouble operator* (vdouble a, const vdouble& b) {
+    int n = a.size();
+    for (int i = 0; i < n; ++i) {
+        a[i] *= b[i];
+    }
+    return a;
 }
 
 vdouble operator* (const vvdouble& a, const vdouble& b) {
@@ -141,6 +155,21 @@ vdouble operator- (vdouble a, const vdouble& b) {
 
 vvdouble operator- (vvdouble a, const vvdouble& b) {
     return a + (-1)*b;
+}
+
+vdouble Pow (vdouble a, int k) {
+    for (int i = 0; i < a.size(); ++i) {
+        a[i] = pow(a[i], k);
+    }
+    return a;
+}
+
+double Sum (const vdouble& v) {
+    double sum = 0;
+    for (auto i: v) {
+        sum += i;
+    }
+    return sum;
 }
 
 double Norma (const complex& c) {
@@ -209,8 +238,11 @@ vvdouble CreateIdentity (int n) {
 
 // Algorithms
 
-vdouble GausseMethod (vvdouble mat) {
+vdouble GausseMethod (vvdouble mat, const vdouble& b) {
     int n = mat.size();
+    for (int i = 0; i < n; ++i) {
+        mat[i].push_back(b[i]);
+    }
     int m = mat[0].size() - 1;
 
     vdouble ans(n, 0);
@@ -235,40 +267,6 @@ vdouble GausseMethod (vvdouble mat) {
 }
 
 
-vvdouble LUDecomposition (vvdouble mat) {
-    int n = mat.size();
-    int m = mat[0].size() - 1;
-
-    vdouble ans(n, 0);
-    vint swapMatrix(n);
-    for (int j = 0; j < std::min(n, m); ++j) {
-        
-        double max = 0;
-        int str;
-        for (int i = j; i < n; ++i) {
-            if (mat[i][j] > max) {
-                max = mat[i][j];
-                str = i;
-            }
-        }
-        swapMatrix[j] = str;
-        std::swap(mat[j], mat[str]);
-        for (int i = j + 1; i < n; ++i) {
-            double r = -mat[i][j] / mat[j][j];
-            for (int k = j; k < m; ++k) {
-                mat[i][k] += mat[j][k] * r;
-            }
-            mat[i][j] = -r;
-        }
-    }
-
-    for (int i = n - 1; i >= 0; --i) {
-        std::swap(mat[i], mat[swapMatrix[i]]);
-    }
-    return mat;
-}
-
-
 vdouble SweepMethod (vvdouble mat) {
     int n = mat.size();
     vdouble p(n, 0);
@@ -289,7 +287,74 @@ vdouble SweepMethod (vvdouble mat) {
     for (int i = n - 2; i >= 0; --i) {
         x[i] = p[i]*x[i + 1] + q[i];
     }
-    //std::cout <<"P: \n" << p << "Q\n" << q;
+    return x;
+}
+
+
+vvdouble LUDecomposition (vvdouble mat) {
+    int n = mat.size();
+
+    vint swapMatrix(n);
+    vvdouble l = CreateIdentity(n);
+    vvdouble u = mat;
+    for (int k = 1; k < n; ++k) {
+        for (int i = k; i < n; ++i) {
+            l[i][k-1] = u[i][k-1] / u[k-1][k-1];
+            for (int j = k - 1; j < n; ++j) {
+                u[i][j] = u[i][j] - l[i][k-1]*u[k-1][j];
+            }
+        }
+    }
+    for (int i = 0; i < n; ++i) {
+        for (int j = i; j < n; ++j) {
+            l[i][j] = u[i][j];
+        }
+    }
+    return l;
+}
+
+vvdouble GetL (vvdouble lu) {
+    int n = lu.size();
+    vvdouble l = CreateIdentity(n);
+    for (int i = 1; i < n; ++i) {
+        for (int j = 0; j < i; ++j) {
+            l[i][j] = lu[i][j];
+        }
+    }
+    return l;
+}
+
+vvdouble GetU (vvdouble lu) {
+    int n = lu.size();
+    vvdouble u(n, vdouble(n));
+    for (int i = 0; i < n; ++i) {
+        for (int j = i; j < n; ++j) {
+            u[i][j] = lu[i][j];
+        }
+    }
+    return u;
+}
+
+vdouble LUSolve (vvdouble lu, const vdouble& b) {
+    int n = lu.size();
+    int last = n - 1;
+    vdouble z = b;
+    vvdouble l = GetL(lu);
+    vvdouble u = GetU(lu);
+    for (int i = 0; i < n; ++i) {
+        for (int j = i+1; j < n; ++j) {
+            z[j] -= l[j][i] * z[i];
+        }
+    }
+
+    vdouble x = z;
+    for (int i = n - 1; i >= 0; --i) {
+        x[i] /= u[i][i];
+        for (int j = i - 1; j >= 0; --j) {
+            x[j] -= x[i] * u[j][i];
+        }
+    }
+
     return x;
 }
 
@@ -313,7 +378,7 @@ vdouble SimpleIter (const vvdouble& m, vdouble b, double eps) {
         x = b + a * prev_x;
     } while (Norma(x - prev_x) > eps);
 
-    //std::cout << count_iter << '\n';
+    std::cout << "Simple method iters count: " << count_iter << '\n';
     return x;
 }
 
@@ -342,7 +407,7 @@ vdouble ZeidelMethod (const vvdouble& m, vdouble b, double eps) {
         }
     } while (Norma(x - prev_x) > eps);
     
-    std::cout << count_iter << '\n';
+    std::cout << "Zeidel method iter count: " << count_iter << '\n';
 
     return x;
 }
@@ -350,11 +415,13 @@ vdouble ZeidelMethod (const vvdouble& m, vdouble b, double eps) {
 
 void FindMaxNDElem (const vvdouble& a, int& res_i, int& res_j) {
     int n = a.size();
-    double max = 0;
+    double max = a[0][1];
+    res_i = 0;
+    res_j = 1;
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            if (a[i][j] > max && i != j) {
-                max = a[i][j];
+            if (std::abs(a[i][j]) > max && i != j) {
+                max = std::abs(a[i][j]);
                 res_i = i;
                 res_j = j;
             }
@@ -366,35 +433,28 @@ double SqrtSumNDElem (const vvdouble& a) {
     int n = a.size();
     double sum = 0;
     for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            if (i < j) {
-                sum += a[i][j] * a[i][j];
-            }
+        for (int j = 0; j < i; ++j) {
+            sum += a[i][j] * a[i][j];
         }
     }
     return sqrt(sum);
 }
 
-vvdouble JakobiMethod (const vvdouble& mat, double eps) {
+vdouble JakobiMethod (const vvdouble& mat, double eps) {
     int n = mat.size();
     int im;
     int jm;
     vvdouble a = mat;
+    vvdouble r = CreateIdentity(n);
     for (int i = 0; SqrtSumNDElem(a) > eps; ++i) {
 
         FindMaxNDElem(a, im, jm); //find max not diagonal elem
-
         double q;
         if (a[im][im] == a[jm][jm]) {
-            q = pi / 4; 
+            q = pi / 4;
         } else {
-            q = 1./2 * atan (2*a[im][jm] / (a[im][im] - a[jm][jm]));
+            q = 0.5 * atan (2*a[im][jm] / (a[im][im] - a[jm][jm]));
         }
-
-        //if (i < 10) {
-        //    std::cout << im << ' ' << jm << ' ' << q << '\n';
-//
-        //}
 
         vvdouble u = CreateIdentity(n);
         u[im][im] = cos(q);
@@ -403,12 +463,20 @@ vvdouble JakobiMethod (const vvdouble& mat, double eps) {
         u[jm][jm] = cos(q);
         vvdouble ut = Trans(u);
 
-        //std::cout << "U:\n" << u;
-        
-        a = ut * a * u;
+        r = r*u;
+        a = (ut * a) * u;
+
     }
 
-    return a;
+    for (int i = 0; i < n; ++i) {
+        std::cout << "x" << i << ": " << r[i];
+    }
+    std::cout << '\n';
+    vdouble res;
+    for (int i = 0; i < n; ++i) {
+        res.push_back(a[i][i]);
+    }
+    return res;
 }
 
 
@@ -498,25 +566,8 @@ vvdouble QRMethod (vvdouble a, double eps) {
         std::swap(a, an);
         QRDecomposition(a, q, r);
         an = r * q;
+        ++i;
     } while (!FinishIterProc(an, a, eps));
+    std::cout << "QR Method iter count: " << i << '\n';
     return an;
-}
-
-int main() {
-    int n;
-    int m;
-
-    std::cin >> n >> m;
-
-    vvdouble a(n, vdouble(m));
-    std::cin >> a;
-
-    int b;
-
-    double e = 0.001;
-
-    vdouble res = SweepMethod(a);
-    std::cout << res;
-
-    return 0;
 }

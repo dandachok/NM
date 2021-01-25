@@ -1,0 +1,34 @@
+\section*{Реализация}
+
+\begin{lstlisting}[language=C++]
+vvdouble HausseholderMatrix (const vvdouble& v) {
+    return CreateIdentity(v.size()) - 2 / (Trans(v) * v)[0][0] * (v * Trans(v));
+}
+
+void QRDecomposition (vvdouble a, vvdouble& q, vvdouble& r) {
+    int n = a.size();
+    q = CreateIdentity(n);
+    for (int i = 0; i < n - 1; ++i) {
+        vvdouble b = GetColumn(a, i);
+        vvdouble h = HausseholderMatrix(b);
+        a = h * a;
+        q = q * h;
+    }
+    r = a;
+}
+
+vvdouble QRMethod (vvdouble a, double eps) {
+    int n = a.size();
+    vvdouble q, r, an = a;
+    vcomplex l(n);
+    int i = 0;
+    do {
+        std::swap(a, an);
+        QRDecomposition(a, q, r);
+        an = r * q;
+    } while (!FinishIterProc(an, a, eps));
+    return an;
+}
+\end{lstlisting}
+
+\pagebreak

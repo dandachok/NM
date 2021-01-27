@@ -1,0 +1,47 @@
+\section*{Результаты}
+
+\begin{lstlisting}[language=bash]
+(base) MacBook-Air-Dima:Program dandachok$ cat tests/input/part3.t
+4 4
+-23 -7 5 2
+-7 -21 4 9
+9 5 -31 -8
+0 1 -2 10
+
+-26 -55 -58 -24
+
+0.01
+(base) MacBook-Air-Dima:Program dandachok$ ./part3 <tests/input/part3.t
+Simple method iters count: 7
+Zeidel method iter count: 5
+Simple ans:
+[0.9998, 2, 3, -2]
+Zeidel ans:
+[0.9999, 2, 3, -2]
+(base) MacBook-Air-Dima:Program dandachok$ 
+\end{lstlisting}
+
+С помощью метода простых итераций ответ был получен 
+за 7 шагов($\varepsilon = 0.01$):
+
+$x = \begin{pmatrix}
+    0.9998 \\
+    2 \\
+    3 \\
+    -2 \\
+\end{pmatrix}$
+
+С помощью улучшения Зейделя ответ был получен 
+за 5 шагов($\varepsilon = 0.01$): 
+
+$x = \begin{pmatrix}
+    0.9999 \\
+    2 \\
+    3 \\
+    -2 \\
+\end{pmatrix}$
+
+Как и ожидалось метод Зейдаля за меньшее число итераций доходит 
+до заданной точности.
+
+\pagebreak

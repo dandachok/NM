@@ -1,0 +1,44 @@
+\section*{Реализация}
+
+\begin{lstlisting}[language=C++]
+vdouble JakobiMethod (const vvdouble& mat, double eps) {
+    int n = mat.size();
+    int im;
+    int jm;
+    vvdouble a = mat;
+    vvdouble r = CreateIdentity(n);
+    for (int i = 0; SqrtSumNDElem(a) > eps; ++i) {
+
+        FindMaxNDElem(a, im, jm); //find max not diagonal elem
+        double q;
+        if (a[im][im] == a[jm][jm]) {
+            q = pi / 4;
+        } else {
+            q = 0.5 * atan (2*a[im][jm] / (a[im][im] - a[jm][jm]));
+        }
+
+        vvdouble u = CreateIdentity(n);
+        u[im][im] = cos(q);
+        u[im][jm] = -sin(q);
+        u[jm][im] = sin(q);
+        u[jm][jm] = cos(q);
+        vvdouble ut = Trans(u);
+
+        r = r*u;
+        a = (ut * a) * u;
+
+    }
+
+    for (int i = 0; i < n; ++i) {
+        std::cout << "x" << i << ": " << r[i];
+    }
+    std::cout << '\n';
+    vdouble res;
+    for (int i = 0; i < n; ++i) {
+        res.push_back(a[i][i]);
+    }
+    return res;
+}
+\end{lstlisting}
+
+\pagebreak

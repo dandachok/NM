@@ -64,26 +64,6 @@ int main() {
     vdouble x = GetValInRange(left, right, h);
     vdouble ry = GetFValInRange(x, &rf);
     std::cout << ry;
-//
-    //EilerMethod2 m(f, left, right, y0, z0);
-    //m(h);
-    //vdouble y = m.GetY();
-    //std::cout << "Eiler method:\n" << y;
-//
-    //RungeKutta2 rk(f, left, right, y0, z0);
-    //rk(h);
-    //vdouble rky = rk.GetY();
-    //std::cout << "Runge-Kutta method 4 order:\n" << rky;
-//
-    //AdamsMethod a(f, left, right, y0, z0);
-    //a(h);
-    //vdouble ay = a.GetY();
-    //std::cout << "Adams method:\n" << ay;
-//
-    //vdouble x = GetValInRange(left, right, h);
-    //y = GetY(x, f_real);
-    //std::cout << "Real funcrion:\n" << y;
-
 
 
     return 0;

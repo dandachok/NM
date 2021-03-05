@@ -1,5 +1,93 @@
 \section*{Реализация}
 
+\subsection*{Полином Лагранжа}
 
+\begin{lstlisting}[language=C++]
+    vdouble CoefPolynomLagrange (const vdouble& x, const vdouble& y) {
+        int n = x.size();
+        vdouble w(n, 1);
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (j != i) {
+                    w[i] *= x[i] - x[j];
+                }
+            }
+            w[i] = y[i] / w[i];
+        }
+        return w;
+    }
+    
+    double PolynomLagrange(const vdouble& x, const vdouble& y, double x0) {
+        int n = x.size();
+        vdouble coef = CoefPolynomLagrange(x, y);
+        double y0 = 0;
+        for (int i = 0; i < n; ++i) {
+            double p = 1;
+            for (int j = 0; j < n; ++j) {
+                if (i != j) {
+                    p *= x0 - x[j];
+                }
+            }
+            y0 += p * coef[i];
+        }
+    
+        return y0;
+    }
+\end{lstlisting}
 
+\subsection*{Полином Ньютона}
+
+\begin{lstlisting}[language=C++]
+class PolynomNewton {
+public:
+
+    PolynomNewton (const vdouble& x, const vdouble& y) {
+        ft = vvdouble(x.size(), vdouble());
+        X = x;
+        int n = x.size();
+        for (int i = 0; i < n; ++i) {
+            ft[i].push_back(y[i]);
+        }
+        for (int j = 0; j < n - 1; ++j) {
+            for (int i = 0; i < n - j - 1; ++i) {
+                double f = ft[i][j] - ft[i + 1][j];
+                f /= x[i] - x[i + j + 1];
+                ft[i].push_back(f);
+            }
+        }
+    }
+
+    void AddPoint(double x, double y) {
+        int n = X.size();
+        X.push_back(x);
+        ft.push_back(vdouble());
+        ft[n].push_back(y);
+        for (int i = n; i > 0; --i) {
+            double f = ft[i - 1][n - i] - ft[i][n - i];
+            f /= X[i - 1] - X[n];
+            ft[i - 1].push_back(f);
+        }
+    }
+
+    const vvdouble& GetFT() const {
+        return ft;
+    }
+
+    double operator() (double x0) const {
+        int n = X.size();
+        double y0 = 0;
+        double p = 1;
+        for (int i = 0; i < n; ++i) {
+            y0 += ft[0][i] * p;
+            p *= (x0 - X[i]);
+
+        }
+        return y0;
+    }
+private:
+    vvdouble ft;
+    vdouble X;
+    vdouble Y;
+};
+\end{lstlisting}
 \pagebreak

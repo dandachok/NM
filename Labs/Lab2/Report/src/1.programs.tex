@@ -1,7 +1,37 @@
 \section*{Реализация}
 
-\begin{lstlisting}[language=C++]
+\subsection*{Метод Ньютона}
 
+\begin{lstlisting}[language=C++]
+double NewtonMethod (double x0, double eps, double (*f)(double), double(*difF)(double)) {
+    double x = x0;
+    double next_x = x0;
+    do {
+        x = next_x;
+        next_x = x - f(x)/difF(x);
+    } while (std::abs(next_x - x) > eps);
+
+    return next_x;
+}
+\end{lstlisting}
+
+\subsection*{Метод простых итераций}
+
+
+\begin{lstlisting}[language=C++]
+double phi (double x) {
+    return std::log(std::sqrt(1 - x*x) + 0.1);
+}
+
+double SimpleIterMethod (double x0, double eps, double (*phi)(double)) {
+    double x = x0;
+    double next_x = x0;
+    do {
+        x = next_x;
+        next_x = phi(x);
+    } while (q / (1 - q) * std::abs(x - next_x) > eps);
+    return next_x;
+}
 \end{lstlisting}
 
 

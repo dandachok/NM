@@ -1,28 +1,128 @@
 \section*{Реализация}
 
+\subsection*{Метод стрельбы}
+
 \begin{lstlisting}[language=C++]
-vdouble SweepMethod (vvdouble mat) {
-    int n = mat.size();
-    vdouble p(n, 0);
-    vdouble q(n, 0);
-    p[0] = -mat[0][2] / mat[0][1];
-    q[0] = mat[0][3] / mat[0][1];
-    for (int i = 1; i < n; ++i) {
-        double a = mat[i][0];
-        double b = mat[i][1];
-        double c = mat[i][2];
-        double d = mat[i][3];
-        p[i] = - c / (b + a*p[i - 1]);
-        q[i] = (d - a*q[i-1]) / (b + a*p[i-1]);
+class ShootingMethodL2R3 {
+    public:
+        ShootingMethodL2R3(BVProblemL2R3 task) : task(task), f(task.f) {}
+
+        void Calc (double h, double eps) {
+            x = GetValInRange(task.left, task.right, h);
+            CauchyProblem ctask1 = task;
+            CauchyProblem ctask2 = task;
+            ctask1.y0 = 1;
+            ctask2.y0 = 0;
+            RungeKutta2 rg1(ctask1);
+            RungeKutta2 rg2(ctask2);
+            double& n1 = rg1.y0;
+            double& n2 = rg2.y0;
+            vdouble y1 = rg1(h);
+            vdouble y2 = rg2(h);
+            if (isFinish(y1, eps)) {
+                y = y1;
+                return;
+            } else if (isFinish(y2, eps)) {
+                y = y2;
+                return;
+            }
+            do {
+                double next_n = GetNextN(n1, n2, y1, y2);
+                n1 = n2;
+                n2 = next_n;
+                y1 = y2;
+                y2 = rg2(h);
+            } while (!isFinish(y2, eps));
+
+            y = y2;
+        }
+
+        vdouble GetY() const {
+            return y;
+        }
+
+    private:
+
+        double GetYDer(const vdouble& y, double xp) {
+            int i = 0;
+            for (; i < x.size() - 2; ++i) {
+                if (x[i] <= xp && xp <= x[i + 1]) {
+                    break;
+                }
+            }
+            return (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
+        }
+
+        double GetPhi (const vdouble& y) {
+            double y_der = GetYDer(y, task.right);
+            double phi = task.re.b * y_der + task.re.a * y[y.size() - 1] - task.re.c;
+            return phi;
+        }
+
+        double GetNextN(double n1, double n2, const vdouble& y1, const vdouble& y2) {
+            double phi1 = GetPhi(y1);
+            double phi2 = GetPhi(y2);
+
+            return n2 - (n2 - n1) / (phi2 - phi1) * phi2;
+        }
+
+        bool isFinish(const vdouble& y, double eps) {
+            double phi = GetPhi(y);
+            return std::abs(phi) < eps;
+        }
+
+        Function3* f;
+        BVProblemL2R3 task;
+
+        vdouble x;
+        vdouble y;
+};
+\end{lstlisting}
+
+\subsection*{Конечно-разностный метод}
+
+\begin{lstlisting}[language=C++]
+class FDMethod {
+    public:
+    FDMethod(Function1* p, Function1* q, BVProblemL2R3 t) :
+        p(p), q(q), task(t) {}
+
+    void Calc(double h) {
+        x = GetValInRange(task.left, task.right, h);
+        int n = (task.right - task.left) / h;
+        vvdouble mat(n + 1, vdouble(4));
+        mat[0][0] = 0;
+        mat[0][1] = -1;
+        mat[0][2] = 1;
+        mat[0][3] = task.z0 * h;
+
+        for (int i = 1; i < n; ++i) {
+            mat[i][0] = 1 - (*p)(x[i]) * h / 2;
+            mat[i][1] = (*q)(x[i]) * h * h - 2;
+            mat[i][2] = 1 + (*p)(x[i]) * h / 2;
+            mat[i][3] = 0;
+        }
+
+        mat[n][0] = -task.re.b;
+        mat[n][1] = h * task.re.a + task.re.b;
+        mat[n][2] = 0;
+        mat[n][3] = task.re.c * h;
+
+        y = SweepMethod(mat);
     }
-    p[n - 1] = 0;
-    vdouble x(n);
-    x[n - 1] = q[n - 1];
-    for (int i = n - 2; i >= 0; --i) {
-        x[i] = p[i]*x[i + 1] + q[i];
+
+    vdouble GetY() {
+        return y;
     }
-    return x;
-}
+
+    private:
+        Function1* p;
+        Function1* q;
+        BVProblemL2R3 task;
+
+        vdouble x;
+        vdouble y;
+};
 \end{lstlisting}
 
 \pagebreak

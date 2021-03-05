@@ -12,7 +12,7 @@ double fNewton (double x) {
 }
 
 double fint (double x) {
-    return x / pow(3*x + 4, 2);
+    return x / pow(3*x + 4, 3);
 }
 
 int main() {

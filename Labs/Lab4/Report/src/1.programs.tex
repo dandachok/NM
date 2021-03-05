@@ -1,50 +1,204 @@
 \section*{Реализация}
 
-\begin{lstlisting}[language=C++]
-vvdouble LUDecomposition (vvdouble mat) {
-    int n = mat.size();
+\subsection*{Метод Эйлера}
 
-    vint swapMatrix(n);
-    vvdouble l = CreateIdentity(n);
-    vvdouble u = mat;
-    for (int k = 1; k < n; ++k) {
-        for (int i = k; i < n; ++i) {
-            l[i][k-1] = u[i][k-1] / u[k-1][k-1];
-            for (int j = k - 1; j < n; ++j) {
-                u[i][j] = u[i][j] - l[i][k-1]*u[k-1][j];
+\begin{lstlisting}[language=C++]
+    class EilerMethod2 {
+    public:
+        EilerMethod2(Function3* f, double left, double right, double y0, double z0) :
+            left(left),
+            right(right),
+            f(f),
+            y0(y0),
+            z0(z0) {
+        }
+    
+        void operator() (double h) {
+            x = GetValInRange(left, right, h);
+            y.clear();
+            z.clear();
+            y.push_back(y0);
+            z.push_back(z0);
+
+            int n = x.size() - 1;
+            for (int i = 0; i < n; ++i) {
+                double z_next = z[i] + h * (*f)(x[i], y[i], z[i]);
+                z.push_back(z_next);
+                double y_next = y[i] + h * z[i];
+                y.push_back(y_next);
             }
         }
-    }
-    for (int i = 0; i < n; ++i) {
-        for (int j = i; j < n; ++j) {
-            l[i][j] = u[i][j];
-        }
-    }
-    return l;
-}
 
-vdouble LUSolve (vvdouble lu, const vdouble& b) {
-    int n = lu.size();
-    int last = n - 1;
-    vdouble z = b;
-    vvdouble l = GetL(lu);
-    vvdouble u = GetU(lu);
-    for (int i = 0; i < n; ++i) {
-        for (int j = i+1; j < n; ++j) {
-            z[j] -= l[j][i] * z[i];
+        vdouble GetY() {
+            return y;
         }
-    }
 
-    vdouble x = z;
-    for (int i = n - 1; i >= 0; --i) {
-        x[i] /= u[i][i];
-        for (int j = i - 1; j >= 0; --j) {
-            x[j] -= x[i] * u[j][i];
+        vdouble GetZ() {
+            return z;
         }
-    }
+    
 
-    return x;
-}
+    private:
+        double left;
+        double right;
+        Function3* f;
+        double h;
+        double y0;
+        double z0;
+
+        vdouble x;
+        vdouble y;
+        vdouble z;
+};
+\end{lstlisting}
+
+\subsection*{Метод Рунге-Кутты}
+
+\begin{lstlisting}[language=C++]
+    class RungeKutta2 {
+    public:
+        RungeKutta2(CauchyProblem t) :
+            left(t.left),
+            right(t.right),
+            f(t.f),
+            y0(t.y0),
+            z0(t.z0) {
+        }
+        
+        vdouble operator() (double h) {
+            x = GetValInRange(left, right, h);
+            int n = x.size();
+            y.clear();
+            z.clear();
+            y.push_back(y0);
+            z.push_back(z0);
+
+            for (int i = 0; i < n - 1; ++i) {
+                vdouble k(ORDER);
+                vdouble l(ORDER);
+                for (int j = 0; j < ORDER; ++j) {
+                    if (j == 0) {
+                        l[j] = h * (*f)(x[i], y[i], z[i]);
+                        k[j] = h * z[i];
+                    }
+                    else if (j == 3) {
+                        l[j] = h * (*f)(x[i] + h, y[i] + k[j - 1], z[i] + l[j - 1]);
+                        k[j] = h * (z[i] + l[j - 1]);
+                    } else {
+                        l[j] = h * (*f)(x[i] + 0.5*h, y[i] + 0.5*k[j - 1], z[i] + 0.5*l[j - 1]);
+                        k[j] = h * (z[i] + 0.5*l[j - 1]);
+                    }
+                }
+
+                double y_next = y[i] + dif(k);
+                double z_next = z[i] + dif(l);
+                y.push_back(y_next);
+                z.push_back(z_next);
+            }
+
+            return y;
+        }
+
+        vdouble GetY() {
+            return y;
+        }
+
+        vdouble GetZ() {
+            return z;
+        }
+
+        vdouble Get() {
+            return y;
+        }
+        
+        Function3* f;
+        double left;
+        double right;
+        double y0;
+        double z0;
+
+    private:
+        double dif (const vdouble& k) {
+            return (k[0] + 2*(k[1] + k[2]) + k[3]) / 6;
+        }
+
+        double g (double z) {
+            return z;
+        }
+
+        static const int ORDER = 4;
+        
+        vdouble x;
+        vdouble y;
+        vdouble z;
+};
+\end{lstlisting}
+
+\subsection*{Метод Адамса}
+
+\begin{lstlisting}[language=C++]
+    class AdamsMethod {
+        public:
+            AdamsMethod(CauchyProblem t) :
+                f(t.f),
+                left(t.left),
+                right(t.right),
+                y0(t.y0),
+                z0(t.z0),
+                task(t) {}
+            
+            void operator() (double h) {
+                RungeKutta2 rk(task);
+                rk(h);
+                x = GetValInRange(left, right, h);
+                y = rk.GetY();
+                z = rk.GetZ();
+    
+                y.resize(4);
+                z.resize(4);
+    
+                int n = x.size();
+                for (int i = 3; i < n - 1; ++i) {
+                    double z_next = z[i] + h / 24 * df(i);
+                    z.push_back(z_next);
+                    double y_next = y[i] + h / 24 * dg(i);
+                    y.push_back(y_next);
+                }
+            }
+    
+            vdouble GetY() {
+                return y;
+            }
+    
+            vdouble GetZ() {
+                return z;
+            }
+        private:
+    
+            double df(int i) {
+                double f0 = (*f)(x[i], y[i], z[i]);
+                double f1 = (*f)(x[i - 1], y[i - 1], z[i - 1]);
+                double f2 = (*f)(x[i - 2], y[i - 2], z[i - 2]);
+                double f3 = (*f)(x[i - 3], y[i - 3], z[i - 3]);
+    
+                return (55*f0 - 59*f1 + 37*f2 - 9*f3);
+            }
+    
+            double dg(int i) {
+                return (55*z[i] - 59*z[i - 1] + 37*z[i - 2] - 9*z[i - 3]);
+            }
+    
+            CauchyProblem task;
+            Function3* f;
+            double left;
+            double right;
+            double y0;
+            double z0;
+    
+            vdouble x;
+            vdouble y;
+            vdouble z;
+    };
 \end{lstlisting}
 
 

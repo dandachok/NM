@@ -358,6 +358,31 @@ vdouble LUSolve (vvdouble lu, const vdouble& b) {
     return x;
 }
 
+double Det (vvdouble lu) {
+    vvdouble u = GetU(lu);
+    int n = lu.size();
+    double det = 1;
+    for (int i = 0; i < n; ++i) {
+        det *= u[i][i];
+    }
+    return det;
+}
+
+vvdouble InversMatrix (vvdouble lu) {
+    int n = lu.size();
+    vvdouble res;
+    for (int i = 0; i < n; ++i) {
+        
+        vdouble simpVec(n, 0);
+        simpVec[i] = 1;
+        
+        vdouble invertColumn = LUSolve(lu, simpVec);
+        res.push_back(invertColumn);
+    }
+
+    return Trans(res);
+}
+
 
 vdouble SimpleIter (const vvdouble& m, vdouble b, double eps) {
     int n = m.size();

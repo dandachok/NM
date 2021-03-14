@@ -239,7 +239,7 @@ public:
             m[i].pop_back();
         }
         a = GausseMethod(m, b);
-        std::cout << a;
+        //std::cout << a;
     }
 
     double F (double x0) {
@@ -253,6 +253,14 @@ public:
 
     double operator() (double x0) {
         return F(x0);
+    }
+
+    vdouble operator() (vdouble x) {
+        vdouble y;
+        for (auto i: x) {
+            y.push_back(F(i));
+        }
+        return y;
     }
 
     double SSE () {

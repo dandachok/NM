@@ -18,6 +18,16 @@ class Function3 {
     }
 };
 
+vdouble RungeRomberg(vdouble y1, vdouble y2) {
+    vdouble ans;
+    int n = y1.size();
+    for (int i = 0; i < n; i += 2) {
+        double res = y1[i] + (y1[i] - y2[i/2])/15;
+        ans.push_back(res);
+    }
+    return ans;
+}
+
 // LDE has the following pattern: a*f'(x) + b*f(x) = c
 
 class LinearDiffEqual {

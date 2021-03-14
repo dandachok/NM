@@ -37,8 +37,6 @@ public:
         int n = x.size();
         int i = getInterval(x0);
         double d;
-        std::cout << i << '\n';
-        std::cout << dydx(i + 1) << " " << dydx(i) << '\n';
         d = 2*(dydx(i + 1) - dydx(i)) / (x[i + 2] - x[i]);
         return d;
     }
@@ -88,9 +86,7 @@ public:
         double res = 0;
         for (int i = 0; i < n - 1; ++i) {
             double d =  f((x[i] + x[i + 1]) / 2);
-            //std::cout << x[i] << '\t' << d << '\n';
             res += d;
-            //std::cout << res << '\n';
         }
         res *= h;
         return res;

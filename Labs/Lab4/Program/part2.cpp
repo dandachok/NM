@@ -40,22 +40,29 @@ int main() {
 
     FDMethod fdm(p, q, task);
 
-    double h = 0.01;
+    double h = 0.1;
     double e = 0.001;
 
     auto x = GetValInRange(left, right, h);
     auto y = GetFValInRange(x, new RealFunc());
 
-    std::cout << "Real function:\n";
-    std::cout << y << '\n';
-
     sm.Calc(h, e);
     fdm.Calc(h);
+    auto sm_y = sm.GetY();
+    auto fdm_y = fdm.GetY();
 
-    std::cout << "Shooting method:\n";
-    std::cout << sm.GetY() << '\n';
-    std::cout << "Finite-difference method:\n";
-    std::cout << fdm.GetY() << '\n';
+    for (int i = 0; i < sm_y.size(); ++i) {
+        std::cout << y[i] << '\t' << sm_y[i];
+        std::cout << '\t' << std::abs(y[i] - sm_y[i]);
+        std::cout << '\t' << fdm_y[i]+0.4;
+        std::cout << '\t' << std::abs(y[i] - fdm_y[i] - 0.4);
+        std::cout << '\n';
+    }
+
+    //std::cout << "Shooting method:\n";
+    //std::cout << sm.GetY() << '\n';
+    //std::cout << "Finite-difference method:\n";
+    //std::cout << fdm.GetY() << '\n';
 
     return 0;
 }

@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1614159957 "/home/danda/Documents/NM/Labs/Lab2/Report/main.tex" "/home/danda/Documents/NM/Labs/Lab2/Report/main.pdf" "main" 1614159958
+["pdflatex"] 1615238130 "/home/danda/Documents/NM/Labs/Lab2/Report/main.tex" "/home/danda/Documents/NM/Labs/Lab2/Report/main.pdf" "main" 1615238131
   "/etc/texmf/web2c/texmf.cnf" 1611828432 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/danda/.texlive2017/texmf-var/fonts/tfm/lh/lh-t2b/lbbx0600.tfm" 1611838835 3100 f2d0be3e6e84182763e912426975f07e ""
   "/home/danda/.texlive2017/texmf-var/fonts/tfm/lh/lh-t2b/lbbx0800.tfm" 1611838829 3084 727475ec14f980eba53a78cc36139159 ""
@@ -16,7 +16,7 @@
   "/home/danda/.texlive2017/texmf-var/fonts/tfm/lh/lh-t2b/lbrm1728.tfm" 1611831757 3028 503ad6c81ac6a57a0b3e9ae5825f3496 ""
   "/home/danda/.texlive2017/texmf-var/fonts/tfm/lh/lh-t2b/lbrm2488.tfm" 1611831749 3040 db8c037651c4f031ca135a66a6c58019 ""
   "/home/danda/.texlive2017/texmf-var/fonts/tfm/lh/lh-t2b/lbtt1000.tfm" 1611831763 1264 69abed4d3010fc49fd37e75025f09f9b ""
-  "/home/danda/Documents/NM/Labs/Lab2/Report/main.aux" 1614159958 836 45761fa2940870d1bada9395f0a23f31 ""
+  "/home/danda/Documents/NM/Labs/Lab2/Report/main.aux" 1615238131 836 45761fa2940870d1bada9395f0a23f31 ""
   "/home/danda/Documents/NM/Labs/Lab2/Report/main.tex" 1611830824 338 85ff42c484ebfb181195dd1c1e4c7a50 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1511824771 3332 103109f5612ad95229751940c61aada0 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1480098698 1004 54797486969f23fa377b128694d548df ""
@@ -125,8 +125,8 @@
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1611831519 2700761 ac0584cc9514ab21918550a6948c4ee2 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1611831566 4127158 20fd0a2d7a056d63a54719cffa8c654f ""
   "log-style.sty" 1611830483 2018 c6c786734a77c979ee8e9ede0705a7b1 ""
-  "main.aux" 1614159958 836 45761fa2940870d1bada9395f0a23f31 ""
-  "main.out" 1614159957 0 d41d8cd98f00b204e9800998ecf8427e ""
+  "main.aux" 1615238131 836 45761fa2940870d1bada9395f0a23f31 ""
+  "main.out" 1615238131 0 d41d8cd98f00b204e9800998ecf8427e ""
   "main.tex" 1611830824 338 85ff42c484ebfb181195dd1c1e4c7a50 ""
   "src/1.info.tex" 1611835465 3002 28589bc6e8b82fc3c3816a77be13cb99 ""
   "src/1.problem.tex" 1611759071 841 df8afa39a4321fa828db59a2d2683410 ""
@@ -136,11 +136,11 @@
   "src/2.problem.tex" 1611759071 1123 9cc0b97c1f643484ccdde27c06ea8c91 ""
   "src/2.programs.tex" 1614159938 1141 e9386af78e167330dd3c1ff41e1e07b4 ""
   "src/2.result.tex" 1614159957 262 b8fdb5857c748bdd3b34df610bbdc66f ""
-  "src/titlepage.tex" 1611828531 1121 ce994f5bfc1ca5d8c7ffda8184083518 ""
+  "src/titlepage.tex" 1615238130 1121 f4b0788413a302d6bbf0c6198236edad ""
   (generated)
+  "main.out"
+  "main.log"
   "/home/danda/Documents/NM/Labs/Lab2/Report/main.pdf"
   "/home/danda/Documents/NM/Labs/Lab2/Report/main.log"
-  "main.out"
-  "main.aux"
   "main.pdf"
-  "main.log"
+  "main.aux"

@@ -1,34 +1,67 @@
 \section*{Реализация}
 
 \begin{lstlisting}[language=C++]
-vvdouble HausseholderMatrix (const vvdouble& v) {
-    return CreateIdentity(v.size()) - 2 / (Trans(v) * v)[0][0] * (v * Trans(v));
-}
+class Integrate {
+public:
+    Integrate(double (*f)(double)) : f(f) {}
+    Integrate(vdouble x, vdouble y) :x(x), y(y){}
 
-void QRDecomposition (vvdouble a, vvdouble& q, vvdouble& r) {
-    int n = a.size();
-    q = CreateIdentity(n);
-    for (int i = 0; i < n - 1; ++i) {
-        vvdouble b = GetColumn(a, i);
-        vvdouble h = HausseholderMatrix(b);
-        a = h * a;
-        q = q * h;
+    void makeNet(double l, double r, double h) {
+        x = GetX(l, r, h);
+        y = GetY(x, f);
     }
-    r = a;
-}
 
-vvdouble QRMethod (vvdouble a, double eps) {
-    int n = a.size();
-    vvdouble q, r, an = a;
-    vcomplex l(n);
-    int i = 0;
-    do {
-        std::swap(a, an);
-        QRDecomposition(a, q, r);
-        an = r * q;
-    } while (!FinishIterProc(an, a, eps));
-    return an;
-}
+    double RectangleMethod (double l, double r, double h) {
+        makeNet(l, r, h);
+        int n = x.size();
+        double res = 0;
+        for (int i = 0; i < n - 1; ++i) {
+            double d =  f((x[i] + x[i + 1]) / 2);
+            res += d;
+        }
+        res *= h;
+        return res;
+    }
+
+    double Trapezium (double l, double r, double h) {
+        makeNet(l, r, h);
+        int n = x.size();
+        double res = Sum(y);
+        res -= (y[0] + y[n - 1]) / 2;
+        res *= h;
+        return res;
+    }
+
+    double Simpson (double l, double r, double h) {
+        makeNet(l, r, h);
+        int n = x.size();
+        double res = y[0] + y[n - 1];
+        for (int i = 1; i < n - 1; ++i) {
+            res += i % 2? 4*y[i]: 2*y[i];
+        }
+        res *= h / 3;
+        return res;
+    }
+
+    double RungeRombergOpt (double f1, double f2, double h1, double h2) {
+        double k = h2 / h1;
+        return f1 + (f1 - f2) / (k*k - 1);
+    }
+private:
+    vdouble GetX(double l, double r, double h) {
+        double x0 = l;
+        vdouble x;
+        while (x0 <= r) {
+            x.push_back(x0);
+            x0 += h;
+        }
+        return x;
+    }
+
+    double (*f)(double) = nullptr;
+    vdouble x;
+    vdouble y;
+};
 \end{lstlisting}
 
 \pagebreak

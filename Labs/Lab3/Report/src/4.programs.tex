@@ -1,44 +1,52 @@
 \section*{Реализация}
 
 \begin{lstlisting}[language=C++]
-vdouble JakobiMethod (const vvdouble& mat, double eps) {
-    int n = mat.size();
-    int im;
-    int jm;
-    vvdouble a = mat;
-    vvdouble r = CreateIdentity(n);
-    for (int i = 0; SqrtSumNDElem(a) > eps; ++i) {
+class Diff {
+public:
+    Diff(vdouble x, vdouble y): x(x), y(y) {}
 
-        FindMaxNDElem(a, im, jm); //find max not diagonal elem
-        double q;
-        if (a[im][im] == a[jm][jm]) {
-            q = pi / 4;
-        } else {
-            q = 0.5 * atan (2*a[im][jm] / (a[im][im] - a[jm][jm]));
+    double dif(double x0) {
+        int n = x.size();
+        int i = getInterval(x0);
+        double d = dy(i) / dx(i);
+        d += (dydx(i + 1) - dydx(i)) * (2*x0 - x[i] - x[i+1]) / (x[i + 2] - x[i]);
+        return d;
+    }
+
+    double dif2(double x0) {
+        int n = x.size();
+        int i = getInterval(x0);
+        double d;
+        d = 2*(dydx(i + 1) - dydx(i)) / (x[i + 2] - x[i]);
+        return d;
+    }
+private:
+
+    double dx(int i) {
+        return x[i + 1] - x[i];
+    }
+    
+    double dy(int i) {
+        return y[i + 1] - y[i];
+    }
+        
+    double dydx(int i) {
+        return dy(i) / dx(i);
+    }
+
+    int getInterval(double x0) {
+        int n = x.size();
+        int i;
+        for (i = 0; i < n - 1; ++i) {
+            if (x[i] <= x0 && x0 <= x[i + 1]) {
+                break;
+            }
         }
-
-        vvdouble u = CreateIdentity(n);
-        u[im][im] = cos(q);
-        u[im][jm] = -sin(q);
-        u[jm][im] = sin(q);
-        u[jm][jm] = cos(q);
-        vvdouble ut = Trans(u);
-
-        r = r*u;
-        a = (ut * a) * u;
-
+        return i;
     }
-
-    for (int i = 0; i < n; ++i) {
-        std::cout << "x" << i << ": " << r[i];
-    }
-    std::cout << '\n';
-    vdouble res;
-    for (int i = 0; i < n; ++i) {
-        res.push_back(a[i][i]);
-    }
-    return res;
-}
+    vdouble x;
+    vdouble y;
+};
 \end{lstlisting}
 
 \pagebreak
